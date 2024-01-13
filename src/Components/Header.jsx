@@ -9,8 +9,8 @@ function Header() {
                     <span className='text-slate-500'>Yash</span>
                     <span className='text-slate-700'>Estates</span>
                 </h1>
-                <form>
-                    <input type="text" placeholder='Search ....' className='bg-transparent' />
+                <form className='bg-slate-100 p-3 rounded-lg'>
+                    <input type="text" placeholder='Search' className='bg-transparent' />
                 </form>
             </div>
         </header>
