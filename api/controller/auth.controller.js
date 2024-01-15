@@ -17,8 +17,19 @@ export const signup = async (req, res, next) => {
         next(error)
 
         //next(errorHandler(550, 'error from the function')) MAnual error message
-
     }
+}
 
+export const signin = async (req, res, next) => {
+    const { email, password } = req.body;
+    try {
+        const validUser = await User.findOne({ email });
+        if (!validUser) return next(errorHandler(404, 'User not found!'))
 
+        const validPassword = bcryptjs.compareSync(password, validUser.password);
+        if (!validPassword) return next(errorHandler(401, 'Incorrect Credentials'));
+
+    } catch (error) {
+        next(error) //indes.js file contains middleware
+    }
 }
