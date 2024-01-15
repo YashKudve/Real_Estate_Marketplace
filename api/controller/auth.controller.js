@@ -1,7 +1,8 @@
 import User from '../models/user.model.js'
 import bcryptjs from 'bcryptjs'
+import { errorHandler } from '../utils/error.js';
 
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
     const { username, email, password } = req.body;
 
     const hashedPassword = bcryptjs.hashSync(password, 10) // 10 is number of rounds for hasing
@@ -13,7 +14,10 @@ export const signup = async (req, res) => {
         //saving user may take time depending upon speed of internet... await function stops the execution at this line until the step is completed successfully.
         res.status(201).json('User Created Succesfully')
     } catch (error) {
-        res.status(500).json(error.message)
+        next(error)
+
+        //next(errorHandler(550, 'error from the function')) MAnual error message
+
     }
 
 
