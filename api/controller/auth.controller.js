@@ -39,3 +39,11 @@ export const signin = async (req, res, next) => {
         next(error) //index.js file contains middleware; this methods maps to middleware
     }
 }
+
+export const google = async (req, res, next) => {
+    try {
+        const user = await User.findOne({ email: req.body.email })
+    } catch (error) {
+        next(error)
+    }
+}
