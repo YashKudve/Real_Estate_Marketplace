@@ -1,15 +1,16 @@
 import React from 'react'
 import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth'
-import { app } from '../firebase.js'
+import { app } from '../firebase.js'//
 import { useDispatch } from 'react-redux';
 import { signInSuccess } from '../redux/user/userSlice.js';
 import { useNavigate } from 'react-router-dom';
 
 function OAuth() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleGoogleClick = async () => {
-        const dispatch = useDispatch();
-        const navigate = useNavigate();
+
         try {
             const provider = new GoogleAuthProvider()
             const auth = getAuth(app)
@@ -21,11 +22,11 @@ function OAuth() {
                     'Content-Type': 'application/json',
                 },
 
-                body: JSON.stringify({ name: result.user.displayName, email: result.user.email, photo: result.user.photoURL })
+                body: JSON.stringify({ name: result.user.displayName, email: result.user.email, photo: result.user.photoURL }),
 
-            })
+            });
 
-            const data = res.json()
+            const data = await res.json()
             dispatch(signInSuccess(data));
             navigate('/')
 
