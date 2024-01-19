@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux';
 import { useRef } from 'react';
-import { getStorage, ref, uploadBytesResumable } from 'firebase/storage'
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
+import { app } from '../firebase.js';
 
 function Profile() {
     const { currentUser } = useSelector((state) => state.user)
     const fileRef = useRef(null)
     const [file, setFile] = useState(undefined)
-    console.log(file)
+    const [filePerc, setFilePerc] = useState(0)
+    const [fileUploadErr, setFileUploadErr] = useState(false)
+    const [formData, setFormData] = useState({})
+    // console.log(formData)
+    // console.log(filePerc)
+    // console.log(fileUploadErr)
 
     useEffect(() => {
         if (file) {
@@ -23,8 +29,22 @@ function Profile() {
         const uploadTask = uploadBytesResumable(storageRef, file);
 
         uploadTask.on('state_changed',
-            (snapshot)
-        )
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                // console.log('Upload is ' + progress + '% complete')
+                setFilePerc(Math.round(progress))
+            },
+            (error) => {
+                setFileUploadErr(true)
+            },
+            () => {
+                getDownloadURL(uploadTask.snapshot.ref).then
+                    ((downloadURL) => {
+                        setFormData({ ...formData, avatar: downloadURL })
+                    })
+            }
+        );
+
 
     }
 
@@ -35,7 +55,19 @@ function Profile() {
             <form className='flex flex-col gap-4'>
 
                 <input type="file" onChange={(e) => setFile(e.target.files[0])} ref={fileRef} hidden accept='image/*' />
-                <img onClick={() => fileRef.current.click()} className='rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2' src={currentUser.avatar} alt="https://www.freeiconspng.com/thumbs/profile-icon-png/profile-icon-9.png" />
+                <img onClick={() => fileRef.current.click()} className='rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2' src={formData.avatar || currentUser.avatar} alt="https://www.freeiconspng.com/thumbs/profile-icon-png/profile-icon-9.png" />
+                <p className='self-center'>
+                    {fileUploadErr ? (
+                        <span className='text-red-700'>Failed to upload image</span>) :
+                        filePerc > 0 && filePerc < 100 ? (
+                            <span className='text-slate-700'>{`Uploading ${filePerc}%`}</span>) :
+                            filePerc === 100 ? (
+                                <span className='text-green-700 font-semibold text-center'>Image Uploaded Successfully !</span>) : (""
+                            )
+
+                    }
+                </p>
+
                 <input type="text" placeholder='Username' id='username' className='border p-3 rounded-lg' />
                 <input type="text" placeholder='Email' id='email' className='border p-3 rounded-lg' />
                 <input type="text" placeholder='Password' id='password' className='border p-3 rounded-lg' />
