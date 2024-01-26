@@ -12,4 +12,4 @@ export const verifyToken = (req, res, next) => {
         req.user = user;
         next(); //go to next step i.e update user  --> user.route.js
     });
-}
+};
